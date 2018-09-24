@@ -17,7 +17,7 @@ func main() {
 	TRX := maltegolocal.MaltegoTransform{}
 
 	if Domain == "" {
-		TRX.AddUIMessage("Domain name missing.")
+		TRX.AddUIMessage("Domain name missing.", "Error!")
 		return
 	}
 
@@ -107,8 +107,7 @@ func assignNumbers( NewEnt *maltegolocal.MaltegoEntityObj, phone, cc, rest, ext 
 
 func processSection(	contact whois_parser.Registrant, 
 			sectionName string, 
-			TRX *maltegolocal.MaltegoTransform)
-			*maltegolocal.MaltegoTransform  {
+			TRX *maltegolocal.MaltegoTransform) *maltegolocal.MaltegoTransform  {
 
 
 	entEmail := TRX.AddEntity("maltego.EmailAddress", contact.Email)

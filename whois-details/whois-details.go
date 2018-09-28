@@ -33,13 +33,13 @@ func main() {
 		return
 	}
 
-	TRX = *processDomain( whois_info.Registrar, &TRX)
+	processDomain( &TRX, whois_info.Registrar)
 
-	TRX = *processSection( whois_info.Registrant, "Registrant", &TRX)
-	TRX = *processSection( whois_info.Admin, "Admin", &TRX)
-	TRX = *processSection( whois_info.Tech, "Tech", &TRX)
+	processSection( &TRX, whois_info.Registrant, "Registrant")
+	processSection( &TRX, whois_info.Admin, "Admin")
+	processSection( &TRX, whois_info.Tech, "Tech")
 
-	TRX = *processRegistrar( whois_info.Registrar, &TRX)
+	processRegistrar( &TRX, whois_info.Registrar)
 
 	TRX.AddUIMessage("completed!","Inform")
 	fmt.Println(TRX.ReturnOutput())
@@ -47,7 +47,7 @@ func main() {
 
 
 
-func processDomain( contact whois_parser.Registrar, TRX *maltegolocal.MaltegoTransform) *maltegolocal.MaltegoTransform  {
+func processDomain( TRX *maltegolocal.MaltegoTransform, contact whois_parser.Registrar) {
 	BaseEnt := TRX.AddEntity("maltego.Domain", contact.DomainName)
 
 	// Process domain specific properties in the Registrar section
@@ -69,9 +69,8 @@ func processDomain( contact whois_parser.Registrar, TRX *maltegolocal.MaltegoTra
 	clnStat := regexp.MustCompile(` http(s|)://.*?(,|$| )`)
 	domStat := clnStat.ReplaceAllString(contact.DomainStatus, `$2`)
 	BaseEnt.AddProperty("domain.status", "domain.status", "nostrict", domStat)
-
-	return TRX
 }
+
 func parseAndVerifyPhone( cPhone string) (phone, cc, rest string) {
 	var matchWhoisNumber = regexp.MustCompile(`^\+[0-9]+\.[0-9]+$`)
 
@@ -105,9 +104,9 @@ func assignNumbers( NewEnt *maltegolocal.MaltegoEntityObj, phone, cc, rest, ext 
 	}
 }
 
-func processSection(	contact whois_parser.Registrant, 
-			sectionName string, 
-			TRX *maltegolocal.MaltegoTransform) *maltegolocal.MaltegoTransform  {
+func processSection(	TRX *maltegolocal.MaltegoTransform,
+			contact whois_parser.Registrant,
+			sectionName string) {
 
 
 	entEmail := TRX.AddEntity("maltego.EmailAddress", contact.Email)
@@ -172,11 +171,9 @@ func processSection(	contact whois_parser.Registrant,
 	// https://timezonedb.com/api
 
 	//continent
-
-	return TRX
 }
 
-func processRegistrar( contact whois_parser.Registrar, TRX *maltegolocal.MaltegoTransform) *maltegolocal.MaltegoTransform  {
+func processRegistrar( TRX *maltegolocal.MaltegoTransform, contact whois_parser.Registrar) {
 	entReg := TRX.AddEntity("maltego.Company", contact.RegistrarName)
 	entReg.AddProperty("registrar.iana_id", "registrar.iana_id",
 		"nostrict", contact.RegistrarID) //**
@@ -191,7 +188,5 @@ func processRegistrar( contact whois_parser.Registrar, TRX *maltegolocal.Maltego
 //   Registrar Abuse Contact Email:
 //   Registrar Abuse Contact Phone:
 //	entReg.AddProperty("registrar.", "registrar." , "nostrict", contact.) //**
-
-	return TRX
 }
 
